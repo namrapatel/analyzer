@@ -12,13 +12,18 @@ public class loginProxy {
 	 */
 	private Hashtable <String, String> loginDict;
 	
-	public loginProxy(String loginFile) {
-		
+	public loginProxy() {
 		
 		loginDict = new Hashtable <String, String>();
+		try {
+			loadLoginInfo();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	public void loadLoginInfo(String filename) throws IOException {
+	private void loadLoginInfo() throws IOException {
 		InputStream is = this.fileAsIO("loginInfo.txt");
 		InputStreamReader reader = new InputStreamReader(is);
 		BufferedReader buff = new BufferedReader(reader);
@@ -39,7 +44,7 @@ public class loginProxy {
 	
 	public boolean validateLogin(String username, String password) {
 		if(this.getLoginDict().containsKey(username)) {
-			if(this.getLoginDict().get(username) == password)
+			if(this.getLoginDict().get(username).equals(password))
 				return true;
 		}
 		return false;

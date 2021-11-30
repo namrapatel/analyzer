@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JOptionPane;
 
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
@@ -31,6 +32,8 @@ import org.jdatepicker.impl.UtilDateModel;
 import cryptoAnalyzer.utils.AvailableCryptoList;
 import cryptoAnalyzer.utils.DataVisualizationCreator;
 
+import cryptoAnalyzer.gui.loginUi;
+
 public class MainUI extends JFrame implements ActionListener{
 	/**
 	 * 
@@ -38,6 +41,7 @@ public class MainUI extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 
 	private static MainUI instance;
+	private static loginUi ins;
 	private JPanel stats, chartPanel, tablePanel;
 	
 	// Should be a reference to a separate object in actual implementation
@@ -175,10 +179,22 @@ public class MainUI extends JFrame implements ActionListener{
 	
 
 	public static void main(String[] args) {
-		JFrame frame = MainUI.getInstance();
-		frame.setSize(900, 600);
-		frame.pack();
-		frame.setVisible(true);
+		
+		ins = loginUi.getInstance();
+		ins.Display();
+		Boolean flag = ins.getHasSubmitted();
+		while(flag == false && ins.getStatus() == false) {
+			flag = ins.getHasSubmitted();
+			System.out.print("");
+		}
+		
+		if(ins.DestroyOnSucess() && ins.getStatus() == true) {
+			JFrame frame = MainUI.getInstance();
+			frame.setSize(900, 600);
+			frame.pack();
+			frame.setVisible(true);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		}
 	}
 
 	@Override
