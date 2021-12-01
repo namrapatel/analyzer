@@ -68,12 +68,11 @@ public class MainUI extends JFrame implements ActionListener{
 		JLabel chooseCountryLabel = new JLabel("Choose a cryptocurrency: ");
 		String[] cryptoNames = AvailableCryptoList.getInstance().getAvailableCryptos();
 		restrictedCoins = new RestrictedCryptoList(cryptoNames);
-		/* Uncomment to see the restricted coins list!
-		 * List <String> theCoins = restrictedCoins.getRestrictedCoins();
+		List <String> theCoins = restrictedCoins.getRestrictedCoins();
 		for(int i = 0; i <theCoins.size();i ++) {
 			System.out.println(theCoins.get(i));
 		}
-		*/
+		
 		cryptoList = new JComboBox<String>(cryptoNames);
 		
 		selectedList = new ArrayList<>();
@@ -121,8 +120,8 @@ public class MainUI extends JFrame implements ActionListener{
 		            if(verifyDate(currentDate,dateReturn))
 		            	return dateReturn;
 		            else {
-		            	JOptionPane.showMessageDialog(null,"Selected Date was in the future!. Please select a new date",
-		            			"Invalid Date",JOptionPane.INFORMATION_MESSAGE);
+		            	JOptionPane.showMessageDialog(null,"Selected Date was in the future!. Please "
+		            			+ "select a new date","Invalid Date",JOptionPane.INFORMATION_MESSAGE);
 		            	return "";
 		            }
 		        }
@@ -197,12 +196,12 @@ public class MainUI extends JFrame implements ActionListener{
 	public Boolean verifyDate(String currdate, String selectedDate) {
 		String[] currArray = currdate.split("-");
 		String[] selArray = selectedDate.split("/");
+		
 		if(Integer.parseInt(selArray[2]) >Integer.parseInt(currArray[0])) 
 			return false;
-		if(Integer.parseInt(selArray[1]) > Integer.parseInt(currArray[1]))
-			return false;
-		if(Integer.parseInt(selArray[0]) > Integer.parseInt(currArray[2]))
-			return false;
+		if(Integer.parseInt(selArray[1]) >= Integer.parseInt(currArray[1]) && Integer.parseInt(selArray[0]) > Integer.parseInt(currArray[2])) {
+				return false;
+		}
 		return true;
 		
 		//sel = d/m/y
