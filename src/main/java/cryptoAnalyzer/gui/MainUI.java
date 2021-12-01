@@ -12,7 +12,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
-import java.time.*;
+
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -32,8 +32,9 @@ import org.jdatepicker.impl.UtilDateModel;
 
 import cryptoAnalyzer.utils.AvailableCryptoList;
 import cryptoAnalyzer.utils.DataVisualizationCreator;
+import cryptoAnalyzer.utils.RestrictedCryptoList;
 
-import cryptoAnalyzer.gui.loginUi;
+
 
 public class MainUI extends JFrame implements ActionListener{
 	/**
@@ -50,7 +51,7 @@ public class MainUI extends JFrame implements ActionListener{
 	
 	private JTextArea selectedCryptoList;
 	private JComboBox<String> cryptoList;
-
+	private RestrictedCryptoList restrictedCoins;
 	public static MainUI getInstance() {
 		if (instance == null)
 			instance = new MainUI();
@@ -66,6 +67,13 @@ public class MainUI extends JFrame implements ActionListener{
 		// Set top bar
 		JLabel chooseCountryLabel = new JLabel("Choose a cryptocurrency: ");
 		String[] cryptoNames = AvailableCryptoList.getInstance().getAvailableCryptos();
+		restrictedCoins = new RestrictedCryptoList(cryptoNames);
+		/* Uncomment to see the restricted coins list!
+		 * List <String> theCoins = restrictedCoins.getRestrictedCoins();
+		for(int i = 0; i <theCoins.size();i ++) {
+			System.out.println(theCoins.get(i));
+		}
+		*/
 		cryptoList = new JComboBox<String>(cryptoNames);
 		
 		selectedList = new ArrayList<>();
@@ -229,12 +237,18 @@ public class MainUI extends JFrame implements ActionListener{
 			DataVisualizationCreator creator = new DataVisualizationCreator();
 			creator.createCharts();
 		} else if ("add".equals(command)) {
-			selectedList.add(cryptoList.getSelectedItem().toString());
-			String text = "";
-			for (String crypto: selectedList)
-				text += crypto + "\n";
-			
+			if(!restrictedCoins.getRestrictedCoins().contains(cryptoList.getSelectedItem().toString())) {
+				selectedList.add(cryptoList.getSelectedItem().toString());
+				String text = "";
+				for (String crypto: selectedList)
+					text += crypto + "\n";
 			selectedCryptoList.setText(text);
+			}
+			else {
+				JOptionPane.showMessageDialog(null,"The cryptocurrency you have chosen belongs to the list "
+						+ "which we have disabled data fetching for. Please select another one.",
+            			"Invalid Cryptocurrency",JOptionPane.INFORMATION_MESSAGE);
+			}
 		} else if ("remove".equals(command)) {
 			selectedList.remove(cryptoList.getSelectedItem());
 			String text = "";
