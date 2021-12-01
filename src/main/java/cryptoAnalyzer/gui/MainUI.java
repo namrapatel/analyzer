@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+import java.time.*;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -95,8 +96,9 @@ public class MainUI extends JFrame implements ActionListener{
 		@SuppressWarnings("serial")
 		JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new AbstractFormatter() {
 			private String datePatern = "dd/MM/yyyy";
-
+			
 		    private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePatern);
+		    private String currentDate = java.time.LocalDate.now().toString();
 
 		    @Override
 		    public Object stringToValue(String text) throws ParseException {
@@ -107,7 +109,14 @@ public class MainUI extends JFrame implements ActionListener{
 		    public String valueToString(Object value) throws ParseException {
 		        if (value != null) {
 		            Calendar cal = (Calendar) value;
-		            return dateFormatter.format(cal.getTime());
+		            String dateReturn = dateFormatter.format(cal.getTime());
+		            if(verifyDate(currentDate,dateReturn))
+		            	return dateReturn;
+		            else {
+		            	JOptionPane.showMessageDialog(null,"Selected Date was in the future!. Please select a new date",
+		            			"Invalid Date",JOptionPane.INFORMATION_MESSAGE);
+		            	return "";
+		            }
 		        }
 
 		        return "";
@@ -176,6 +185,21 @@ public class MainUI extends JFrame implements ActionListener{
 		stats.revalidate();
 	}
 
+	
+	public Boolean verifyDate(String currdate, String selectedDate) {
+		String[] currArray = currdate.split("-");
+		String[] selArray = selectedDate.split("/");
+		if(Integer.parseInt(selArray[2]) >Integer.parseInt(currArray[0])) 
+			return false;
+		if(Integer.parseInt(selArray[1]) > Integer.parseInt(currArray[1]))
+			return false;
+		if(Integer.parseInt(selArray[0]) > Integer.parseInt(currArray[2]))
+			return false;
+		return true;
+		
+		//sel = d/m/y
+		//cur = y/m/day
+	}
 	
 
 	public static void main(String[] args) {
