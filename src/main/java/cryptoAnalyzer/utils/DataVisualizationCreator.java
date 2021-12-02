@@ -33,15 +33,8 @@ import cryptoAnalyzer.gui.MainUI;
 //Rewrite this file once we can pull data from API.
 public class DataVisualizationCreator {
 	
-	private Result theResult;
-	private ResultData theData;
 	
-	public DataVisualizationCreator(Result result) {
-		//This will contain the column names and data for each coin like the arrays in createTableOutput.
-		//We can use these to generate each graph.
-		theResult = result;
-		theData = theResult.getResultData();
-	}
+	//Write a constructor that takes in a ChartData object
 	
 	public void createCharts() {
 		createTableOutput(); 

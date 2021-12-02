@@ -46,7 +46,34 @@ import cryptoAnalyzer.gui.loginUi;
 
 public class MainUI extends JFrame implements ActionListener{
 	/**
+	 * Summary of Changes:
+	 * - Created Analysis interface which all analysis Types implement, all analysis types still need their actual analysis
+	 * - Created factory class, still needs an implmenentation
+	 * - Created Result, ResultData, and User Selection
 	 * 
+	 * TO DO - 
+	 * I messed up on creation of ResultData class. I wrote is as handleing multiple cryptos when it should only handle since each 
+	 * result object is tied to one coin. 
+	 * Each Result object will have a ResultData object. We can then generate an object called ChartData which will
+	 * have Object[] columnNames (I think this is just similar to what is in his dummy data) and Object[][]data which will be the combination of all ResultData 's from all the Results.
+	 * The layout comes from his dummy data in DataVisualizationCreator
+	 * 
+	 * -Assign instance vars for metric, date, and interval.
+	 * 
+	 * Write all the performs for the different analysis
+	 *  - use dataFetcher for this
+	 * Write ChartData class
+	 * 
+	 *Implement All commented out code in this file
+	 *
+	 *How it works: 
+	 *Basically, we create a list of userSelcetion objects, one for each coin (metric, date and interval stay the same for each).
+	 * Then Run an analysis for each userSelection and store each Result in a list of Results. We then need to get 
+	 * the ResultData object from each result and combine the Data into a 2d array similar to 
+	 * the dummy data in his DataVisualizationCreator class. We will have to write a constructor for DataVisualizationCreator 
+	 * that takes in a CharData object as its parameter. Essentailly, the ChartData object will just replace his dummy data that
+	 * is hard coded in there
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -58,15 +85,20 @@ public class MainUI extends JFrame implements ActionListener{
 	private List<String> selectedList;
 	private JComboBox<String> metricsList;
 	private JComboBox<String> intervalList;
+	private JDatePickerImpl datePicker;
 	private JTextArea selectedCryptoList;
 	private JComboBox<String> cryptoList;
 
 	private RestrictedCryptoList restrictedCoins;
 
-	private Analysis theAnalysis; //dont need a list because we can just use the same var each cycle of loop. We do not need to keep track of each analysis, but need to keep track of each result
+	
 	private List<Result> listOfResults; // need a list of results because we need to keep track of each analysis for each coin
 	private List<UserSelection> listOfSelections; // need a list because we need to store a new selection for each coin in the list
-
+	
+	private String selectedMetric;
+	private String selectedDate;
+	private String selectedInterval;
+	
 	public static MainUI getInstance() {
 		if (instance == null)
 			instance = new MainUI();
@@ -115,8 +147,8 @@ public class MainUI extends JFrame implements ActionListener{
 		p.put("text.month", "Month");
 		p.put("text.year", "Year");
 		JDatePanelImpl datePanel = new JDatePanelImpl(dateModel, p);
-		@SuppressWarnings("serial")
-		JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new AbstractFormatter() {
+		
+		datePicker = new JDatePickerImpl(datePanel, new AbstractFormatter() {
 			private String datePatern = "dd/MM/yyyy";
 			
 		    private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePatern);
@@ -133,6 +165,7 @@ public class MainUI extends JFrame implements ActionListener{
 		            Calendar cal = (Calendar) value;
 		            String dateReturn = dateFormatter.format(cal.getTime());
 		            if(verifyDate(currentDate,dateReturn))
+		            	//Set instance variable for date here
 		            	return dateReturn;
 		            else {
 		            	JOptionPane.showMessageDialog(null,"Selected Date was in the future!. Please "
@@ -143,7 +176,12 @@ public class MainUI extends JFrame implements ActionListener{
 
 		        return "";
 		    }
+		    
+		    
 		});
+		
+		
+		
 		
 		JButton refresh = new JButton("Refresh");
 		refresh.setActionCommand("refresh");
@@ -160,7 +198,7 @@ public class MainUI extends JFrame implements ActionListener{
 		metricsNames.add("Percent Change in MarketCap");
 		metricsNames.add("Percent Change in Volume");
 		metricsNames.add("Percent Change of Coins in Circulation");
-		metricsList = new JComboBox<String>(metricsNames);
+	    metricsList = new JComboBox<String>(metricsNames);
 		metricsList.setActionCommand("metric");
 		metricsList.addActionListener(this);
 
@@ -172,8 +210,10 @@ public class MainUI extends JFrame implements ActionListener{
 		intervalNames.add("Monthly");
 		intervalNames.add("Yearly");
 
-		JComboBox<String> intervalList = new JComboBox<String>(intervalNames);
-
+		intervalList = new JComboBox<String>(intervalNames);
+		intervalList.setActionCommand("interval");
+		intervalList.addActionListener(this);
+		
 		JPanel south = new JPanel();
 		south.add(from);
 		south.add(datePicker);
@@ -254,16 +294,28 @@ public class MainUI extends JFrame implements ActionListener{
 		String command = e.getActionCommand();
 		if ("refresh".equals(command)) {
 			/*
-			 * So here is where the most action happens. 
-			 * Sequence of events follows:
-			 * -(This should be an instance var)Analysis theAnalysis = factory.create(userSelection);
-			 * Result theResult = theAnalysis.perform();
-			 * result.notify(); 
+			 * Call method to create UserSelections and add them to selection list
+			 * this function will folow:
+			 * for all coins theCoin in selectedCryptos{
+			 * 		create new userSelection (theCoin, metric, date,interval);
+			 * 		add to userSelectionList;
+			 * }
+			 * Then, 
+			 * for all user Selections "theUserSelection" in Selection list{
+			 * 		The Analysis = factory.create(theUserSelection)
+			 * 		Result = theAnalysis.perform();
+			 * 		add result to list of Results;
+			 * }
+			 * Then,
+			 * For all results in list{
+			 * 		get each results data and append to ChartData object. We'll figure out how to do this
+			 * 
+			 * }
 			 * */
 			stats.removeAll(); // keep this line
 			
 			//Remove these 2 lines in place of result.notifyObservers();
-			DataVisualizationCreator creator = new DataVisualizationCreator(null); //Remove this null late, just temp!
+			DataVisualizationCreator creator = new DataVisualizationCreator(); 
 			creator.createCharts();
 		} else if ("add".equals(command)) {
 			if(!restrictedCoins.getRestrictedCoins().contains(cryptoList.getSelectedItem().toString())) {
@@ -286,8 +338,16 @@ public class MainUI extends JFrame implements ActionListener{
 			
 			selectedCryptoList.setText(text);
 		}else if ("metric".equals(command)) {
-			String typeOfAnalysis = metricsList.getSelectedItem().toString();
-			//Factory Call here, assign to Instance variable analysis
+			//Get value of the metricsList object
+			// Have if statements based on value of metricsLists object,
+			//Assign the selectedMetric instance variable to:
+			//price,cap,vol,cic,price%,cap%,vol%, or cic %
+			// The above are values that will get stored in each userSelection, which is used by factory class. This step does not get done here.
+			
+		}else if("interval".equals(command)) {
+			//get value of intervalList object
+			//Assign this value to the selectedInterval instance variable
+			//This value will get stored in each user Selection
 		}
 	}
 
