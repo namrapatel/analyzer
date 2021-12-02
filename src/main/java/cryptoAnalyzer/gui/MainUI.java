@@ -30,10 +30,18 @@ import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
+import cryptoAnalyzer.utils.Analysis;
 import cryptoAnalyzer.utils.AvailableCryptoList;
 import cryptoAnalyzer.utils.DataVisualizationCreator;
+
 import cryptoAnalyzer.utils.RestrictedCryptoList;
 
+
+
+import cryptoAnalyzer.utils.Factory;
+import cryptoAnalyzer.utils.UserSelection;
+import cryptoAnalyzer.utils.Result;
+import cryptoAnalyzer.gui.loginUi;
 
 
 public class MainUI extends JFrame implements ActionListener{
@@ -48,10 +56,17 @@ public class MainUI extends JFrame implements ActionListener{
 	
 	// Should be a reference to a separate object in actual implementation
 	private List<String> selectedList;
-	
+	private JComboBox<String> metricsList;
+	private JComboBox<String> intervalList;
 	private JTextArea selectedCryptoList;
 	private JComboBox<String> cryptoList;
+
 	private RestrictedCryptoList restrictedCoins;
+
+	private Analysis theAnalysis; //dont need a list because we can just use the same var each cycle of loop. We do not need to keep track of each analysis, but need to keep track of each result
+	private List<Result> listOfResults; // need a list of results because we need to keep track of each analysis for each coin
+	private List<UserSelection> listOfSelections; // need a list because we need to store a new selection for each coin in the list
+
 	public static MainUI getInstance() {
 		if (instance == null)
 			instance = new MainUI();
@@ -141,7 +156,13 @@ public class MainUI extends JFrame implements ActionListener{
 		metricsNames.add("MarketCap");
 		metricsNames.add("Volume");
 		metricsNames.add("Coins in circulation");
-		JComboBox<String> metricsList = new JComboBox<String>(metricsNames);
+		metricsNames.add("Percent Change in Unit Price");
+		metricsNames.add("Percent Change in MarketCap");
+		metricsNames.add("Percent Change in Volume");
+		metricsNames.add("Percent Change of Coins in Circulation");
+		metricsList = new JComboBox<String>(metricsNames);
+		metricsList.setActionCommand("metric");
+		metricsList.addActionListener(this);
 
 		JLabel intervalLabel = new JLabel("        Choose interval: ");
 
@@ -232,8 +253,17 @@ public class MainUI extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
 		if ("refresh".equals(command)) {
-			stats.removeAll();
-			DataVisualizationCreator creator = new DataVisualizationCreator();
+			/*
+			 * So here is where the most action happens. 
+			 * Sequence of events follows:
+			 * -(This should be an instance var)Analysis theAnalysis = factory.create(userSelection);
+			 * Result theResult = theAnalysis.perform();
+			 * result.notify(); 
+			 * */
+			stats.removeAll(); // keep this line
+			
+			//Remove these 2 lines in place of result.notifyObservers();
+			DataVisualizationCreator creator = new DataVisualizationCreator(null); //Remove this null late, just temp!
 			creator.createCharts();
 		} else if ("add".equals(command)) {
 			if(!restrictedCoins.getRestrictedCoins().contains(cryptoList.getSelectedItem().toString())) {
@@ -255,6 +285,9 @@ public class MainUI extends JFrame implements ActionListener{
 				text += crypto + "\n";
 			
 			selectedCryptoList.setText(text);
+		}else if ("metric".equals(command)) {
+			String typeOfAnalysis = metricsList.getSelectedItem().toString();
+			//Factory Call here, assign to Instance variable analysis
 		}
 	}
 

@@ -30,10 +30,21 @@ import org.jfree.data.time.TimeSeriesCollection;
 
 import cryptoAnalyzer.gui.MainUI;
 
+//Rewrite this file once we can pull data from API.
 public class DataVisualizationCreator {
 	
+	private Result theResult;
+	private ResultData theData;
+	
+	public DataVisualizationCreator(Result result) {
+		//This will contain the column names and data for each coin like the arrays in createTableOutput.
+		//We can use these to generate each graph.
+		theResult = result;
+		theData = theResult.getResultData();
+	}
+	
 	public void createCharts() {
-		createTableOutput();
+		createTableOutput(); 
 		createTimeSeries();
 		createScatter();
 		createBar();
