@@ -8,11 +8,13 @@ private UserSelection theSelection;
 	}
 	
 	public Result perform() {
-		//use theSelection to generate HTTP get request for data.
-		//Parse JSON file to generate Object[] columnNames and Object[][]data
-		//ResultData theData = new ResultData(columnNames,data);
-		//Result theResult = new Result(theData);
-		//return theResult;
+		//Loop to make api calls for each date needed
+			//make api call (coin,date)
+			//Object[i] == result of api Call 
+		
+		//Loop to calculate cic
+		//Result theResult = new Result(Object[])
+		//returm theResult;
 		return null; // Temp
 	}
 }

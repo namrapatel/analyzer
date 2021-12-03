@@ -12,7 +12,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
-
+import java.util.Date;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -96,7 +96,7 @@ public class MainUI extends JFrame implements ActionListener{
 	private List<UserSelection> listOfSelections; // need a list because we need to store a new selection for each coin in the list
 	
 	private String selectedMetric;
-	private String selectedDate;
+	private Date selectedDate;
 	private String selectedInterval;
 	
 	public static MainUI getInstance() {
@@ -164,9 +164,10 @@ public class MainUI extends JFrame implements ActionListener{
 		        if (value != null) {
 		            Calendar cal = (Calendar) value;
 		            String dateReturn = dateFormatter.format(cal.getTime());
-		            if(verifyDate(currentDate,dateReturn))
-		            	//Set instance variable for date here
+		            if(verifyDate(currentDate,dateReturn)) {
+		            	selectedDate = dateFormatter.parse(dateReturn);
 		            	return dateReturn;
+		            }
 		            else {
 		            	JOptionPane.showMessageDialog(null,"Selected Date was in the future!. Please "
 		            			+ "select a new date","Invalid Date",JOptionPane.INFORMATION_MESSAGE);
@@ -307,6 +308,7 @@ public class MainUI extends JFrame implements ActionListener{
 			 * 		add result to list of Results;
 			 * }
 			 * Then,
+			
 			 * For all results in list{
 			 * 		get each results data and append to ChartData object. We'll figure out how to do this
 			 * 
@@ -339,7 +341,7 @@ public class MainUI extends JFrame implements ActionListener{
 			selectedCryptoList.setText(text);
 		}else if ("metric".equals(command)) {
 			//Get value of the metricsList object
-			// Have if statements based on value of metricsLists object,
+			// Have if   based on value of metricsLists object,
 			//Assign the selectedMetric instance variable to:
 			//price,cap,vol,cic,price%,cap%,vol%, or cic %
 			// The above are values that will get stored in each userSelection, which is used by factory class. This step does not get done here.

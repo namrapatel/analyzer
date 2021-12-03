@@ -1,11 +1,13 @@
 package cryptoAnalyzer.utils;
-import java.text.SimpleDateFormat;
+
 import java.util.Date;
 public class UserSelection {
 	private String coin;
 	private String interval;
-	private String date;
+	private Date date;
 	private String analysisType;
+	private Date[] daysNeeded;
+	
 	
 	
 	public String getCoin() {
@@ -14,7 +16,7 @@ public class UserSelection {
 	public String getInterval() {
 		return this.interval;
 	}
-	public String getDate() {
+	public Date getDate() {
 		return this.date;
 	}
 	public String getAnalysisType() {
@@ -26,7 +28,7 @@ public class UserSelection {
 	public void setInterval(String theInterval) {
 		this.interval = theInterval;
 	}
-	public void setDate(String theDate) {
+	public void setDate(Date theDate) {
 		this.date = theDate;
 	}
 	
@@ -34,5 +36,11 @@ public class UserSelection {
 		this.analysisType = type;
 	}
 	
+	public Date[] getDaysNeeded() {
+		return this.daysNeeded;
+	}
+	/*We would need a function to assign days needed based on the starting day and the interval.
+	 * 
+	 */
 	
 }
