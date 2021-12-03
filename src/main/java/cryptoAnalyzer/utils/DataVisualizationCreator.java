@@ -3,6 +3,7 @@ package cryptoAnalyzer.utils;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -36,6 +37,7 @@ public class DataVisualizationCreator {
 	
 	//Write a constructor that takes in a ChartData object
 	
+	
 	public void createCharts() {
 		createTableOutput(); 
 		createTimeSeries();
@@ -48,6 +50,7 @@ public class DataVisualizationCreator {
 		Object[] columnNames = {"Cryptocurrency","13-Sept","14-Sept","15-Sept","16-Sept","17-Sept"};
 		
 		// Dummy data for demo purposes. These should come from actual fetcher
+		
 		Object[][] data = {
 				{"Bitcoin", "50368.67", "51552.05", "47228.30", "45263.90", "46955.41"},
 				{"Ethereum", "3912.28", "3927.27", "3460.48", "3486.09", "3550.29"},
