@@ -30,10 +30,14 @@ import org.jfree.data.time.TimeSeriesCollection;
 
 import cryptoAnalyzer.gui.MainUI;
 
+//Rewrite this file once we can pull data from API.
 public class DataVisualizationCreator {
 	
+	
+	//Write a constructor that takes in a ChartData object
+	
 	public void createCharts() {
-		createTableOutput();
+		createTableOutput(); 
 		createTimeSeries();
 		createScatter();
 		createBar();
