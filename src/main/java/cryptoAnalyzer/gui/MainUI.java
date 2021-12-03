@@ -331,6 +331,7 @@ public class MainUI extends JFrame implements ActionListener{
 				JOptionPane.showMessageDialog(null,"The cryptocurrency you have chosen belongs to the list "
 						+ "which we have disabled data fetching for. Please select another one.",
             			"Invalid Cryptocurrency",JOptionPane.INFORMATION_MESSAGE);
+				
 			}
 		} else if ("remove".equals(command)) {
 			selectedList.remove(cryptoList.getSelectedItem());
