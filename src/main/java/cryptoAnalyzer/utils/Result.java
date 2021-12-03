@@ -1,14 +1,13 @@
 package cryptoAnalyzer.utils;
 
 public class Result {
-	private ResultData resultData; // This is where the data from analysis gets stored
+	private Object[] resultData;	
 	
 	
-	public Result(ResultData data) {
+	public Result(Object[] data) {
 		resultData = data;
-		
 	}
-	public ResultData getResultData() {
+	public Object[] getResultData() {
 		return this.resultData;
 	}
 	
