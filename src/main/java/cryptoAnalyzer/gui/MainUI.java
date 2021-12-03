@@ -92,8 +92,8 @@ public class MainUI extends JFrame implements ActionListener{
 	private RestrictedCryptoList restrictedCoins;
 
 	
-	private List<Result> listOfResults; // need a list of results because we need to keep track of each analysis for each coin
-	private List<UserSelection> listOfSelections; // need a list because we need to store a new selection for each coin in the list
+	private List<Result> listOfResults = new ArrayList<Result>(); // need a list of results because we need to keep track of each analysis for each coin
+	private List<UserSelection> listOfSelections = new ArrayList<UserSelection>(); // need a list because we need to store a new selection for each coin in the list
 	
 	private String selectedMetric;
 	private Date selectedDate;
@@ -294,31 +294,61 @@ public class MainUI extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
 		if ("refresh".equals(command)) {
-			/*
-			 * Call method to create UserSelections and add them to selection list
-			 * this function will folow:
-			 * for all coins theCoin in selectedCryptos{
-			 * 		create new userSelection (theCoin, metric, date,interval);
-			 * 		add to userSelectionList;
-			 * }
-			 * Then, 
-			 * for all user Selections "theUserSelection" in Selection list{
-			 * 		The Analysis = factory.create(theUserSelection)
-			 * 		Result = theAnalysis.perform();
-			 * 		add result to list of Results;
-			 * }
-			 * Then,
 			
-			 * For all results in list{
-			 * 		get each results data and append to ChartData object. We'll figure out how to do this
-			 * 
-			 * }
-			 * */
-			stats.removeAll(); // keep this line
+			if(selectedList.isEmpty()) {
+				JOptionPane.showMessageDialog(null,"There are no cryptocurrencies selected. Please make at least one selection",
+						"Empty Coin List",JOptionPane.INFORMATION_MESSAGE);
+			}
+			else {
+				/*
+				 * Call method to create UserSelections and add them to selection list
+				 * this function will folow:
+				 * for all coins theCoin in selectedCryptos{
+				 * 		create new userSelection (theCoin, metric, date,interval);
+				 * 		add to userSelectionList;
+				 * }
+				 */
+				for(int i = 0; i <selectedList.size();i++) {
+					UserSelection newSelection = new UserSelection(selectedList.get(i),selectedInterval,selectedMetric,selectedDate);
+					listOfSelections.add(newSelection);
+				}
+				
+				/*Just a test to see if everything works, uncomment if you wish to use.
+				String datePatern = "dd-MM-yyyy";
+			    SimpleDateFormat dateFormatter = new SimpleDateFormat(datePatern);
+				for(int i = 0; i <listOfSelections.size();i++) {
+					System.out.println(listOfSelections.get(i).getCoin() +", "+
+									   listOfSelections.get(i).getInterval()+", "+
+									   listOfSelections.get(i).getAnalysisType()+", "+
+									   dateFormatter.format(listOfSelections.get(i).getDate()));
+				}
+				*/
+				
+				/*
+				 * Then, 
+				 * for all user Selections "theUserSelection" in Selection list{
+				 * 		The Analysis = factory.create(theUserSelection)
+				 * 		Result = theAnalysis.perform();
+				 * 		add result to list of Results;
+				 * }
+				 * Then,
+				
+				 * For all results in list{
+				 * 		get each results data and append to ChartData object. We'll figure out how to do this
+				 * 
+				 * }
+				 * */
+				stats.removeAll(); // keep this line
+				
+				//Remove these 2 lines in place of result.notifyObservers();
+				DataVisualizationCreator creator = new DataVisualizationCreator(); 
+				creator.createCharts();
+			}
 			
-			//Remove these 2 lines in place of result.notifyObservers();
-			DataVisualizationCreator creator = new DataVisualizationCreator(); 
-			creator.createCharts();
+			
+			
+			
+			
 		} else if ("add".equals(command)) {
 			if(!restrictedCoins.getRestrictedCoins().contains(cryptoList.getSelectedItem().toString())) {
 				selectedList.add(cryptoList.getSelectedItem().toString());
@@ -331,6 +361,7 @@ public class MainUI extends JFrame implements ActionListener{
 				JOptionPane.showMessageDialog(null,"The cryptocurrency you have chosen belongs to the list "
 						+ "which we have disabled data fetching for. Please select another one.",
             			"Invalid Cryptocurrency",JOptionPane.INFORMATION_MESSAGE);
+				
 			}
 		} else if ("remove".equals(command)) {
 			selectedList.remove(cryptoList.getSelectedItem());
@@ -341,15 +372,37 @@ public class MainUI extends JFrame implements ActionListener{
 			selectedCryptoList.setText(text);
 		}else if ("metric".equals(command)) {
 			//Get value of the metricsList object
-			// Have if   based on value of metricsLists object,
-			//Assign the selectedMetric instance variable to:
-			//price,cap,vol,cic,price%,cap%,vol%, or cic %
-			// The above are values that will get stored in each userSelection, which is used by factory class. This step does not get done here.
+			String val = metricsList.getSelectedItem().toString();
+			switch(val) {
+				case "Price":
+					selectedMetric = "price";
+					break;
+				case "MarketCap":
+					selectedMetric = "cap";
+					break;
+				case "Volume":
+					selectedMetric = "vol";
+					break;
+				case "Coins in circulation":
+					selectedMetric = "cic";
+					break;
+				case "Percent Change in Unit Price":
+					selectedMetric = "price%";
+					break;
+				case "Percent Change in MarketCap":
+					selectedMetric = "cap%";
+					break;
+				case "Percent Change in Volume":
+					selectedMetric = "vol%";
+					break;
+				case "Percent Change of Coins in Circulation":
+					selectedMetric = "cic%";
+					break;
+			}
+			
 			
 		}else if("interval".equals(command)) {
-			//get value of intervalList object
-			//Assign this value to the selectedInterval instance variable
-			//This value will get stored in each user Selection
+			selectedInterval = intervalList.getSelectedItem().toString();
 		}
 	}
 
