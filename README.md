@@ -2,12 +2,12 @@
 This is Group 19's CS 2212 Project
 To login to the system, use one of the following usernames (they can be found at src/main/resources/loginInfo.txt):
 
-The following are in the form username,password:
-mcheveri,mcheveri123
-cduffy,cduffy123
-npatel,npatel123
-jdifalco,jdifalco123
-admin,admin
+The following are in the form username,password: \n
+mcheveri,mcheveri123 \n
+cduffy,cduffy123 \n
+npatel,npatel123 \n
+jdifalco,jdifalco123 \n
+admin,admin \n
 
 To Generate a graph: 
 - Add at least one cryptocurrency to the list
