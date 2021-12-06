@@ -46,9 +46,4 @@ public class UserSelection {
 	public Date[] getDaysNeeded() {
 		return this.daysNeeded;
 	}
-
-	/*We would need a function to assign days needed based on the starting day and the interval.
-	 * 
-	 */
-	
 }
