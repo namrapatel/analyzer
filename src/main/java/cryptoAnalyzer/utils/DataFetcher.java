@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -36,7 +38,9 @@ public class DataFetcher {
 			}
 
 		} catch (IOException e) {
-			System.out.println("Something went wrong with the API call.");
+			JOptionPane.showMessageDialog(null,"Something went wrong with the API call. System will now exit",
+					"Fatal Error in API Call",JOptionPane.INFORMATION_MESSAGE);
+			System.exit(-1);
 		}
 		return null;
 	}
@@ -80,15 +84,5 @@ public class DataFetcher {
 		return volume;
 	}
 	
-	public static void main(String[] args) {
-		DataFetcher fetcher = new DataFetcher();
-		double price = fetcher.getPriceForCoin("bitcoin", "08-09-2021");
-		double marketCap = fetcher.getMarketCapForCoin("bitcoin", "08-09-2021");
-		double volume = fetcher.getVolumeForCoin("bitcoin", "08-09-2021");
-		
-		System.out.println("Bitcoin=>\tPrice: " + price + 
-								"\n\t\tMarket Cap: " + marketCap + 
-								"\n\t\tVolume: "+volume);
-		
-	}
+	
 }

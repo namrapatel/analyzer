@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
+import javax.swing.JOptionPane;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -31,12 +32,22 @@ import org.jfree.data.time.TimeSeriesCollection;
 
 import cryptoAnalyzer.gui.MainUI;
 
+import java.lang.Integer;
+
 //Rewrite this file once we can pull data from API.
 public class DataVisualizationCreator {
 	
+	private ChartData theData;
+	private String theInterval;
+	private String theMetric;
 	
 	//Write a constructor that takes in a ChartData object
-	
+	public DataVisualizationCreator(ChartData data) {
+		theData = data;
+		theInterval = theData.getUserSelection().getInterval();
+		theMetric = renameMetric(theData.getUserSelection().getAnalysisType());
+		
+	}
 	
 	public void createCharts() {
 		createTableOutput(); 
@@ -44,18 +55,45 @@ public class DataVisualizationCreator {
 		createScatter();
 		createBar();
 	}
-
+	private String renameMetric(String theMetric) {
+		String toReturn = "";
+		if(theMetric.equals("price")) {
+			toReturn = "Price";
+		}
+		else if(theMetric.equals("cap")) {
+			toReturn = "Market Capitalization";
+		}
+		else if(theMetric.equals("vol")) {
+			toReturn = "Transaction Volume";
+		}
+		else if(theMetric.equals("cic")) {
+			toReturn = "Coins in Circulation";
+		}
+		else if(theMetric.equals("price%")){
+			toReturn = "% Change in Price";
+		}
+		else if(theMetric.equals("cap%")) {
+			toReturn = "% Change in Market Capitalization";
+		}
+		else if(theMetric.equals("vol%")) {
+			toReturn = "% Change in Transaction Volume";
+		}
+		else if(theMetric.equals("cic%")) {
+			toReturn = "% Change in Coins in CirculationMarket Cap";
+		}
+		return toReturn;
+	}
 	private void createTableOutput() {
 		// Dummy dates for demo purposes. These shoul come from selection menu
-		Object[] columnNames = {"Cryptocurrency","13-Sept","14-Sept","15-Sept","16-Sept","17-Sept"};
+		Object[] columnNames = new Object[theData.getDates().length + 1];
+		columnNames[0] = "Cryptocurrency";
+		for(int i = 1; i < columnNames.length;i ++) {
+			columnNames[i] = theData.getDates()[i-1].toString();
+		}
 		
 		// Dummy data for demo purposes. These should come from actual fetcher
 		
-		Object[][] data = {
-				{"Bitcoin", "50368.67", "51552.05", "47228.30", "45263.90", "46955.41"},
-				{"Ethereum", "3912.28", "3927.27", "3460.48", "3486.09", "3550.29"},
-				{"Cardano", "2.87", "2.84", "2.41", "2.43", "2.59"}
-		};
+		Object[][] data = theData.getData();
 		
 
 		JTable table = new JTable(data, columnNames);
@@ -76,31 +114,31 @@ public class DataVisualizationCreator {
 	}
 
 	private void createTimeSeries() {
-		TimeSeries series1 = new TimeSeries("Bitcoin - Daily");
-		series1.add(new Day(13, 9, 2021), 50368.67);
-		series1.add(new Day(14, 9, 2021), 51552.05);
-		series1.add(new Day(15, 9, 2021), 47228.30);
-		series1.add(new Day(16, 9, 2021), 45263.90);
-		series1.add(new Day(17, 9, 2021), 46955.41);
 		
-		TimeSeries series2 = new TimeSeries("Ethereum - Daily");
-		series2.add(new Day(13, 9, 2021), 3912.28);
-		series2.add(new Day(14, 9, 2021), 3927.27);
-		series2.add(new Day(15, 9, 2021), 3460.48);
-		series2.add(new Day(16, 9, 2021), 3486.09);
-		series2.add(new Day(17, 9, 2021), 3550.29);
-
-		TimeSeries series3 = new TimeSeries("Cardano - Daily");
-		series3.add(new Day(13, 9, 2021), 2.87);
-		series3.add(new Day(14, 9, 2021), 2.84);
-		series3.add(new Day(15, 9, 2021), 2.41);
-		series3.add(new Day(16, 9, 2021), 2.43);
-		series3.add(new Day(17, 9, 2021), 2.59);
+		
+		TimeSeries[] theSeries = new TimeSeries[theData.getRow()];
+		
+		for(int i = 0; i < theData.getRow(); i ++) {
+			String seriesTitle = theData.getData()[i][0].toString();
+			TimeSeries series = new TimeSeries(seriesTitle +" - "+theInterval);
+			for(int j= 0; j < theData.getDates().length; j ++) {
+				String theDate = theData.getDates()[j].toString();
+				int day = Integer.parseInt(theDate.split("-")[0]);
+				int month = Integer.parseInt(theDate.split("-")[1]);
+				int year = Integer.parseInt(theDate.split("-")[2]);
+				double value = (double) theData.getData()[i][j+1];
+				series.add(new Day(day,month,year),value);
+			}
+			theSeries[i] = series;
+			
+		}
+				
 
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
-		dataset.addSeries(series1);
-		dataset.addSeries(series2);
-		dataset.addSeries(series3);
+		for(int i = 0; i < theSeries.length; i++) {
+			dataset.addSeries(theSeries[i]);
+		}
+		
 
 		XYPlot plot = new XYPlot();
 		XYSplineRenderer splinerenderer1 = new XYSplineRenderer();
@@ -115,7 +153,7 @@ public class DataVisualizationCreator {
 		//plot.mapDatasetToRangeAxis(1, 1); // 2nd dataset to 2nd y-axis
 		//plot.mapDatasetToRangeAxis(2, 2);// 3rd dataset to 3rd y-axis
 		
-		JFreeChart chart = new JFreeChart("Daily Price Line Chart", new Font("Serif", java.awt.Font.BOLD, 18), plot,
+		JFreeChart chart = new JFreeChart(theInterval+" "+ theMetric+" Line Chart", new Font("Serif", java.awt.Font.BOLD, 18), plot,
 				true);
 
 		ChartPanel chartPanel = new ChartPanel(chart);
@@ -127,31 +165,28 @@ public class DataVisualizationCreator {
 	}
 	
 	private void createScatter() {
-		TimeSeries series1 = new TimeSeries("Bitcoin - Daily");
-		series1.add(new Day(13, 9, 2021), 50368.67);
-		series1.add(new Day(14, 9, 2021), 51552.05);
-		series1.add(new Day(15, 9, 2021), 47228.30);
-		series1.add(new Day(16, 9, 2021), 45263.90);
-		series1.add(new Day(17, 9, 2021), 46955.41);
+		TimeSeries[] theSeries = new TimeSeries[theData.getRow()];
 		
-		TimeSeries series2 = new TimeSeries("Ethereum - Daily");
-		series2.add(new Day(13, 9, 2021), 3912.28);
-		series2.add(new Day(14, 9, 2021), 3927.27);
-		series2.add(new Day(15, 9, 2021), 3460.48);
-		series2.add(new Day(16, 9, 2021), 3486.09);
-		series2.add(new Day(17, 9, 2021), 3550.29);
-
-		TimeSeries series3 = new TimeSeries("Cardano - Daily");
-		series3.add(new Day(13, 9, 2021), 2.87);
-		series3.add(new Day(14, 9, 2021), 2.84);
-		series3.add(new Day(15, 9, 2021), 2.41);
-		series3.add(new Day(16, 9, 2021), 2.43);
-		series3.add(new Day(17, 9, 2021), 2.59);
+		for(int i = 0; i < theData.getRow(); i ++) {
+			String seriesTitle = theData.getData()[i][0].toString();
+			TimeSeries series = new TimeSeries(seriesTitle +" - "+theInterval);
+			for(int j= 0; j < theData.getDates().length; j ++) {
+				String theDate = theData.getDates()[j].toString();
+				int day = Integer.parseInt(theDate.split("-")[0]);
+				int month = Integer.parseInt(theDate.split("-")[1]);
+				int year = Integer.parseInt(theDate.split("-")[2]);
+				double value = (double) theData.getData()[i][j+1];
+				series.add(new Day(day,month,year),value);
+			}
+			theSeries[i] = series;
+			
+		}
+				
 
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
-		dataset.addSeries(series1);
-		dataset.addSeries(series2);
-		dataset.addSeries(series3);
+		for(int i = 0; i < theSeries.length; i++) {
+			dataset.addSeries(theSeries[i]);
+		}
 
 		XYPlot plot = new XYPlot();
 		XYItemRenderer itemrenderer1 = new XYLineAndShapeRenderer(false, true);
@@ -165,7 +200,7 @@ public class DataVisualizationCreator {
 		//plot.mapDatasetToRangeAxis(0, 0);// 1st dataset to 1st y-axis
 		//plot.mapDatasetToRangeAxis(1, 1); // 2nd dataset to 2nd y-axis
 		
-		JFreeChart scatterChart = new JFreeChart("Daily Price Scatter Chart",
+		JFreeChart scatterChart = new JFreeChart(theInterval+" "+ theMetric+" Scatter Chart",
 				new Font("Serif", java.awt.Font.BOLD, 18), plot, true);
 
 		ChartPanel chartPanel = new ChartPanel(scatterChart);
@@ -178,23 +213,16 @@ public class DataVisualizationCreator {
 	private void createBar() {
 		
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-		dataset.setValue(50368.67, "Bitcoin", "13-Sept");
-		dataset.setValue(51552.05, "Bitcoin", "14-Sept");
-		dataset.setValue(47228.30, "Bitcoin", "15-Sept");
-		dataset.setValue(45263.90, "Bitcoin", "16-Sept");
-		dataset.setValue(46955.41, "Bitcoin", "17-Sept");
-
-		dataset.setValue(3912.28, "Ethereum", "13-Sept");
-		dataset.setValue(3927.27, "Ethereum", "14-Sept");
-		dataset.setValue(3460.48, "Ethereum", "15-Sept");
-		dataset.setValue(3486.09, "Ethereum", "16-Sept");
-		dataset.setValue(3550.29, "Ethereum", "17-Sept");
-		
-		dataset.setValue(2.87, "Cardano", "13-Sept");
-		dataset.setValue(2.84, "Cardano", "14-Sept");
-		dataset.setValue(2.41, "Cardano", "15-Sept");
-		dataset.setValue(2.43, "Cardano", "16-Sept");
-		dataset.setValue(2.59, "Cardano", "17-Sept");
+		for(int i = 0; i < theData.getRow(); i ++) {
+			String coinName = theData.getData()[i][0].toString();
+			for(int j= 0; j < theData.getDates().length; j ++) {
+				String theDate = theData.getDates()[j].toString();
+				double value = (double) theData.getData()[i][j+1];
+				dataset.setValue(value, coinName, theDate);
+			}
+			
+			
+		}
 
 		CategoryPlot plot = new CategoryPlot();
 		BarRenderer barrenderer1 = new BarRenderer();
@@ -210,7 +238,7 @@ public class DataVisualizationCreator {
 		//plot.mapDatasetToRangeAxis(0, 0);// 1st dataset to 1st y-axis
 		//plot.mapDatasetToRangeAxis(1, 1); // 2nd dataset to 2nd y-axis
 
-		JFreeChart barChart = new JFreeChart("Daily Price Bar Chart", new Font("Serif", java.awt.Font.BOLD, 18), plot,
+		JFreeChart barChart = new JFreeChart(theInterval+" "+ theMetric+" Bar Chart", new Font("Serif", java.awt.Font.BOLD, 18), plot,
 				true);
 
 		ChartPanel chartPanel = new ChartPanel(barChart);

@@ -1,6 +1,8 @@
 package cryptoAnalyzer.utils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class VolumeAnalysis implements Analysis {
@@ -17,70 +19,166 @@ private UserSelection theSelection;
 		String coin = theSelection.getCoin();
 		ArrayList<Object> volume = new ArrayList<Object>();
 		Object[] result = null;
-		int count = 1;
-		volume.set(0, coin);
+		int count;
+		volume.add(coin);
 		DataFetcher apiCall = new DataFetcher();
 		Date workingDate = startDate;
-		while (startDate.before(currentDate)||startDate.equals(currentDate)) {
-			String thisDay = workingDate.toString();								//may be the error
-			volume.set(count, apiCall.getVolumeForCoin(coin, thisDay));
-			count++;
+		while (workingDate.before(currentDate)||workingDate.equals(currentDate)) {
+			volume.add(apiCall.getVolumeForCoin(coin.toLowerCase(), dateFormatter(workingDate)));
+			Calendar c = Calendar.getInstance();
+			c.setTime(workingDate);
+			c.add(Calendar.DATE, 1);
+			workingDate = c.getTime();
 		}
 		if(interval == "Daily") {													//Check spelling that is sent			
 			//do analysis type on all spaces in  the ArrayList and store in result as an array
 			result = volume.toArray();											
 		}
 		else if(interval == "Weekly") {
-			workingDate = startDate;
-			count = 1;
-			int size = volume.size();
-			int intervalResult = 0, place = 1;
-			while(size >= 7) {
-				for(int i=0; i<7; i++) {
-					int j = (Integer) volume.get(count);
-					intervalResult = intervalResult + j;							//Analysis type
-					count++;
+			count = 0;
+			int size = volume.size() -1;
+			result = new Object[(int) (Math.ceil((double)size/7))];
+			double intervalResult = 0;
+			int place = 0;
+			if(size >= 7) {
+				
+				for(int i = 1; i < volume.size() -1;i++) {
+					intervalResult += (double)volume.get(i);
+					count ++;
+					if(count == 7) {
+						result[place] = intervalResult/7;
+						place++;
+						count = 0;
+						size -=7;
+						intervalResult = 0;
+					}
+					if(place == result.length -1) {
+						// add up the remaining interval if it is anything other than 7
+						if(size < 7) {
+							for(int j = i; j < volume.size() -1; j++) {
+								intervalResult +=(double)volume.get(j);
+							}
+							result[place] = intervalResult/size;
+						}
+						//if the last inverval is a perfect week
+						else if (size == 7) {
+							for(int j = i; j < volume.size() -1; j++) {
+								intervalResult +=(double)volume.get(j);
+							}
+							result[place] = intervalResult/7;
+						}
+					}
 				}
-				result[place] = intervalResult / 7;
-				place++;
-				intervalResult = 0;
-				size -= 7;
+				
+			
 			}
-			if (size < 7 && size > 0){
+			
+			else if (size < 7 && size > 0){
+				int count1 = 1;
 				for(int i = size; i>0; i--) {
-					int j = (Integer) volume.get(count);
+					double j = (double) volume.get(count1);
 					intervalResult = intervalResult + j;
-					count++;
+					count1++;
 				}
 				result[place] = intervalResult / size;
 			}
 		}
 		else if (interval == "Monthly") {
+			count = 0;
+			int size = volume.size() -1;
+			result = new Object[(int) (Math.ceil((double)size/30))];
+			double intervalResult = 0;
+			int place = 0;
+			if(size >= 30) {
+				
+				for(int i = 1; i < volume.size() -1;i++) {
+					intervalResult += (double)volume.get(i);
+					count ++;
+					if(count == 30) {
+						result[place] = intervalResult/30;
+						place++;
+						count = 0;
+						size -=30;
+						intervalResult = 0;
+					}
+					if(place == result.length -1) {
+						// add up the remaining interval if it is anything other than 7
+						if(size < 30) {
+							for(int j = i; j < volume.size() -1; j++) {
+								intervalResult +=(double)volume.get(j);
+							}
+							result[place] = intervalResult/size;
+						}
+						//if the last inverval is a perfect week
+						else if (size == 30) {
+							for(int j = i; j < volume.size() -1; j++) {
+								intervalResult +=(double)volume.get(j);
+							}
+							result[place] = intervalResult/30;
+						}
+					}
+				}
+				
 			
+			}
+			
+			else if (size < 30 && size > 0){
+				int count1 = 1;
+				for(int i = size; i>0; i--) {
+					double j = (double) volume.get(count1);
+					intervalResult = intervalResult + j;
+					count1++;
+				}
+				result[place] = intervalResult / size;
+			}
 			
 			
 		}
 		else if (interval == "Yearly") {
-			workingDate = startDate;
-			count = 1;
-			int size = volume.size();
-			int intervalResult = 0, place = 1;
-			while(size >= 365) {
-				for(int i=0; i<365; i++) {
-					int j = (Integer) volume.get(count);
-					intervalResult = intervalResult + j;			//Analysis type
-					count++;
+			count = 0;
+			int size = volume.size() -1;
+			result = new Object[(int) (Math.ceil((double)size/7))];
+			double intervalResult = 0;
+			int place = 0;
+			if(size >= 365) {
+				
+				for(int i = 1; i < volume.size() -1;i++) {
+					intervalResult += (double)volume.get(i);
+					count ++;
+					if(count == 365) {
+						result[place] = intervalResult/365;
+						place++;
+						count = 0;
+						size -=365;
+						intervalResult = 0;
+					}
+					if(place == result.length -1) {
+						// add up the remaining interval if it is anything other than 7
+						if(size < 365) {
+							for(int j = i; j < volume.size() -1; j++) {
+								intervalResult +=(double)volume.get(j);
+							}
+							result[place] = intervalResult/size;
+						}
+						//if the last inverval is a perfect week
+						else if (size == 365) {
+							for(int j = i; j < volume.size() -1; j++) {
+								intervalResult +=(double)volume.get(j);
+							}
+							result[place] = intervalResult/365;
+						}
+					}
 				}
-				result[place] = intervalResult / 7;
-				place++;
-				intervalResult = 0;
-				size -= 365;
+				
+			
 			}
-			if (size < 365 && size > 0){
+			
+			else if (size < 365 && size > 0){
+				int count1 = 1;
 				for(int i = size; i>0; i--) {
-					int j = (Integer) volume.get(count);
+					double j = (double) volume.get(count1);
 					intervalResult = intervalResult + j;
-					count++;
+					count1++;
 				}
 				result[place] = intervalResult / size;
 			}
@@ -93,5 +191,10 @@ private UserSelection theSelection;
 		//ResultData theData = new ResultData(columnNames,data);
 		//Result theResult = new Result(theData);
 		//return theResult;
+	}
+	private String dateFormatter(Date theDate) {
+		String datePatern = "dd-MM-yyyy";
+	    SimpleDateFormat dateFormatter = new SimpleDateFormat(datePatern);
+	    return dateFormatter.format(theDate);
 	}
 }

@@ -41,6 +41,7 @@ import cryptoAnalyzer.utils.RestrictedCryptoList;
 import cryptoAnalyzer.utils.Factory;
 import cryptoAnalyzer.utils.UserSelection;
 import cryptoAnalyzer.utils.Result;
+import cryptoAnalyzer.utils.ChartData;
 import cryptoAnalyzer.gui.loginUi;
 
 
@@ -95,10 +96,11 @@ public class MainUI extends JFrame implements ActionListener{
 	private List<Result> listOfResults = new ArrayList<Result>(); // need a list of results because we need to keep track of each analysis for each coin
 	private List<UserSelection> listOfSelections = new ArrayList<UserSelection>(); // need a list because we need to store a new selection for each coin in the list
 	
-	private String selectedMetric;
+	private String selectedMetric = "price";
 	private Date selectedDate;
-	private String selectedInterval;
+	private String selectedInterval = "Daily";
 	
+	private ChartData theChartData;
 	public static MainUI getInstance() {
 		if (instance == null)
 			instance = new MainUI();
@@ -324,24 +326,29 @@ public class MainUI extends JFrame implements ActionListener{
 				}
 				*/
 				
-				/*
-				 * Then, 
-				 * for all user Selections "theUserSelection" in Selection list{
-				 * 		The Analysis = factory.create(theUserSelection)
-				 * 		Result = theAnalysis.perform();
-				 * 		add result to list of Results;
-				 * }
-				 * Then,
 				
-				 * For all results in list{
-				 * 		get each results data and append to ChartData object. We'll figure out how to do this
-				 * 
-				 * }
-				 * */
+				for(int i =0; i < listOfSelections.size(); i ++) {
+					Factory theFactory = new Factory();
+					Analysis newAnalysis = theFactory.create(listOfSelections.get(i));
+					Result newResult = newAnalysis.perform();
+					listOfResults.add(newResult);
+					
+				}
+				/*
+				for(int i = 0; i < listOfResults.size(); i++) {
+					Result theResult = listOfResults.get(i);
+					Object [] theData = theResult.getResultData();
+					for(int j = 0; j < theData.length; j++) {
+						System.out.println(theData[j].toString());
+					}
+				}
+				*/
+				
+				theChartData = new ChartData(listOfResults, listOfSelections.get(0));
 				stats.removeAll(); // keep this line
 				
 				//Remove these 2 lines in place of result.notifyObservers();
-				DataVisualizationCreator creator = new DataVisualizationCreator(); 
+				DataVisualizationCreator creator = new DataVisualizationCreator(theChartData); 
 				creator.createCharts();
 			}
 			
@@ -350,26 +357,41 @@ public class MainUI extends JFrame implements ActionListener{
 			
 			
 		} else if ("add".equals(command)) {
-			if(!restrictedCoins.getRestrictedCoins().contains(cryptoList.getSelectedItem().toString())) {
-				selectedList.add(cryptoList.getSelectedItem().toString());
+			if(selectedList.contains(cryptoList.getSelectedItem())) {
+				JOptionPane.showMessageDialog(null,"The Coin you wish to add is already in the list!",
+            			"Invalid Add",JOptionPane.INFORMATION_MESSAGE);
+			}
+			else {
+				if(!restrictedCoins.getRestrictedCoins().contains(cryptoList.getSelectedItem().toString())) {
+					selectedList.add(cryptoList.getSelectedItem().toString());
+					String text = "";
+					for (String crypto: selectedList)
+						text += crypto + "\n";
+				selectedCryptoList.setText(text);
+				}
+				else {
+					JOptionPane.showMessageDialog(null,"The cryptocurrency you have chosen belongs to the list "
+							+ "which we have disabled data fetching for. Please select another one.",
+	            			"Invalid Cryptocurrency",JOptionPane.INFORMATION_MESSAGE);
+					
+				}
+			}
+			
+		} else if ("remove".equals(command)) {
+			if(selectedList.contains(cryptoList.getSelectedItem())) {
+				selectedList.remove(cryptoList.getSelectedItem());
 				String text = "";
 				for (String crypto: selectedList)
 					text += crypto + "\n";
-			selectedCryptoList.setText(text);
+				
+				selectedCryptoList.setText(text);
 			}
 			else {
-				JOptionPane.showMessageDialog(null,"The cryptocurrency you have chosen belongs to the list "
-						+ "which we have disabled data fetching for. Please select another one.",
-            			"Invalid Cryptocurrency",JOptionPane.INFORMATION_MESSAGE);
-				
+				JOptionPane.showMessageDialog(null,"The Coin you wish to remove is not added to the list!",
+            			"Invalid Remove",JOptionPane.INFORMATION_MESSAGE);
 			}
-		} else if ("remove".equals(command)) {
-			selectedList.remove(cryptoList.getSelectedItem());
-			String text = "";
-			for (String crypto: selectedList)
-				text += crypto + "\n";
 			
-			selectedCryptoList.setText(text);
+			
 		}else if ("metric".equals(command)) {
 			//Get value of the metricsList object
 			String val = metricsList.getSelectedItem().toString();
