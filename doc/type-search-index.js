@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"cryptoAnalyzer.utils","l":"AvailableCryptoList"}]
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"cryptoAnalyzer.utils","l":"ChartData"}]
