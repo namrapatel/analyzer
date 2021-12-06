@@ -1,6 +1,23 @@
+/**
+ * Factory class used to get the requested type of analysis
+ * 
+ * @author 	Matthew Cheverie
+ * @author 	Jack Di Falco
+ * @author 	Cole Duffy
+ * @author 	Namra Patel
+ * @version 1.0
+ * @since 	1.0 
+ * 
+ */
 package cryptoAnalyzer.utils;
 
 public class Factory {
+	/**
+	 * Create class that takes the user's selected analysis type and performs the analysis 
+	 * on each of the cryptos currently in the list over the specified interval
+	 * @param users analysis selection
+	 * @return data from requested analysis 
+	 */
 	public Analysis create(UserSelection selection) {
 		if (selection.getAnalysisType().equals("price"))
 			return new PriceAnalysis(selection);

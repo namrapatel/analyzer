@@ -1,3 +1,14 @@
+/**
+ * Class used to get data from CoinGecko API
+ * 
+ * @author 	Matthew Cheverie
+ * @author 	Jack Di Falco
+ * @author 	Cole Duffy
+ * @author 	Namra Patel
+ * @version 1.0
+ * @since 	1.0 
+ * 
+ */
 package cryptoAnalyzer.utils;
 
 import java.io.IOException;
@@ -14,7 +25,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class DataFetcher {
-
+	/**
+	 * Get information for given coin on given date from coinGecko API stored in a json file
+	 * @param id of the coin to get data for
+	 * @param date to get data from
+	 * @return json file with data from coingecko
+	 */
 	private JsonObject getDataForCrypto(String id, String date) {
 
 		String urlString = String.format(
@@ -45,6 +61,12 @@ public class DataFetcher {
 		return null;
 	}
 	
+	/**
+	 * Returns the price of a given coin on a given date
+	 * @param id of the coin to get data for
+	 * @param date to get the data from
+	 * @return the price as a double
+	 */
 	public double getPriceForCoin(String id, String date) {
 		double price = 0.0;
 		
@@ -57,7 +79,12 @@ public class DataFetcher {
 		
 		return price;
 	}
-	
+	/**
+	 * Returns the market cap of a given coin on a given date
+	 * @param id of the coin to get data for
+	 * @param date to get the data from
+	 * @return the market cap as a double
+	 */
 	public double getMarketCapForCoin(String id, String date) {
 		double marketCap = 0.0;
 		
@@ -71,6 +98,12 @@ public class DataFetcher {
 		return marketCap;
 	}
 	
+	/**
+	 * Returns the volume of a given coin on a given date
+	 * @param id of the coin to get data for
+	 * @param date to get the data from
+	 * @return the volume as a double
+	 */
 	public double getVolumeForCoin(String id, String date) {
 		double volume = 0.0;
 		

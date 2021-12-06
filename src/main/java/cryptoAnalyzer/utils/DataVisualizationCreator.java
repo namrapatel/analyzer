@@ -3,15 +3,14 @@ package cryptoAnalyzer.utils;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.util.List;
+
 
 import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
-import javax.swing.JOptionPane;
+
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -34,27 +33,46 @@ import cryptoAnalyzer.gui.MainUI;
 
 import java.lang.Integer;
 
-//Rewrite this file once we can pull data from API.
+/**
+ * This class represents the object that will create and display the charts
+ * @author Matthew Cheverie
+ * @author Cole Duffy
+ * @author Namra Patel
+ * @author Jack DiFalco
+ *
+ */
 public class DataVisualizationCreator {
-	
+	//Declare instance varibles
 	private ChartData theData;
 	private String theInterval;
 	private String theMetric;
 	
-	//Write a constructor that takes in a ChartData object
+	/**
+	 * The constructor for this class. 
+	 * It gets the char data from the Chart Data object, as well as the interval and the metric
+	 * We use renameMetric to make it more presentable for the charts
+	 * @param data The chartData object containing all the chartData
+	 */
 	public DataVisualizationCreator(ChartData data) {
 		theData = data;
 		theInterval = theData.getUserSelection().getInterval();
 		theMetric = renameMetric(theData.getUserSelection().getAnalysisType());
 		
 	}
-	
+	/**
+	 * The function that creates charts and sends the to the main ui through MainUI.updateStats()
+	 */
 	public void createCharts() {
 		createTableOutput(); 
 		createTimeSeries();
 		createScatter();
 		createBar();
 	}
+	/**
+	 * Function that makes the metric variable more presentable for the charts
+	 * @param theMetric The metric to rename
+	 * @return A string represnting a better metric name for the chart
+	 */
 	private String renameMetric(String theMetric) {
 		String toReturn = "";
 		if(theMetric.equals("price")) {
@@ -83,21 +101,20 @@ public class DataVisualizationCreator {
 		}
 		return toReturn;
 	}
+	/**
+	 * This function will create the table chart for the mainUI
+	 * Uses the data from the chartData object 
+	 */
 	private void createTableOutput() {
-		// Dummy dates for demo purposes. These shoul come from selection menu
 		Object[] columnNames = new Object[theData.getDates().length + 1];
 		columnNames[0] = "Cryptocurrency";
 		for(int i = 1; i < columnNames.length;i ++) {
 			columnNames[i] = theData.getDates()[i-1].toString();
 		}
 		
-		// Dummy data for demo purposes. These should come from actual fetcher
-		
 		Object[][] data = theData.getData();
-		
-
 		JTable table = new JTable(data, columnNames);
-		//table.setPreferredSize(new Dimension(600, 300));
+		
 		
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBorder (BorderFactory.createTitledBorder (BorderFactory.createEtchedBorder (),
@@ -112,7 +129,10 @@ public class DataVisualizationCreator {
 		
 		MainUI.getInstance().updateStats(scrollPane);
 	}
-
+	/**
+	 * This function will create the Line chart for the mainUI
+	 * Uses the data from the chartData object 
+	 */
 	private void createTimeSeries() {
 		
 		
@@ -149,9 +169,7 @@ public class DataVisualizationCreator {
 		plot.setDomainAxis(domainAxis);
 		plot.setRangeAxis(new LogAxis("Price(USD)"));
 
-		//plot.mapDatasetToRangeAxis(0, 0);// 1st dataset to 1st y-axis
-		//plot.mapDatasetToRangeAxis(1, 1); // 2nd dataset to 2nd y-axis
-		//plot.mapDatasetToRangeAxis(2, 2);// 3rd dataset to 3rd y-axis
+		
 		
 		JFreeChart chart = new JFreeChart(theInterval+" "+ theMetric+" Line Chart", new Font("Serif", java.awt.Font.BOLD, 18), plot,
 				true);
@@ -163,7 +181,10 @@ public class DataVisualizationCreator {
 		
 		MainUI.getInstance().updateStats(chartPanel);
 	}
-	
+	/**
+	 * This function will create the scatter plot chart for the mainUI
+	 * Uses the data from the chartData object 
+	 */
 	private void createScatter() {
 		TimeSeries[] theSeries = new TimeSeries[theData.getRow()];
 		
@@ -197,8 +218,7 @@ public class DataVisualizationCreator {
 		plot.setDomainAxis(domainAxis);
 		plot.setRangeAxis(new LogAxis("Price(USD)"));
 
-		//plot.mapDatasetToRangeAxis(0, 0);// 1st dataset to 1st y-axis
-		//plot.mapDatasetToRangeAxis(1, 1); // 2nd dataset to 2nd y-axis
+		
 		
 		JFreeChart scatterChart = new JFreeChart(theInterval+" "+ theMetric+" Scatter Chart",
 				new Font("Serif", java.awt.Font.BOLD, 18), plot, true);
@@ -209,7 +229,10 @@ public class DataVisualizationCreator {
 		chartPanel.setBackground(Color.white);
 		MainUI.getInstance().updateStats(chartPanel);
 	}
-	
+	/**
+	 * This function will create the bar chart for the mainUI
+	 * Uses the data from the chartData object 
+	 */
 	private void createBar() {
 		
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
@@ -235,8 +258,7 @@ public class DataVisualizationCreator {
 		rangeAxis.setRange(new Range(1.0, 70000.0));
 		plot.setRangeAxis(rangeAxis);
 
-		//plot.mapDatasetToRangeAxis(0, 0);// 1st dataset to 1st y-axis
-		//plot.mapDatasetToRangeAxis(1, 1); // 2nd dataset to 2nd y-axis
+		
 
 		JFreeChart barChart = new JFreeChart(theInterval+" "+ theMetric+" Bar Chart", new Font("Serif", java.awt.Font.BOLD, 18), plot,
 				true);

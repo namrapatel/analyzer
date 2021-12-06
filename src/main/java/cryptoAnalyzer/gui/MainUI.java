@@ -42,65 +42,62 @@ import cryptoAnalyzer.utils.Factory;
 import cryptoAnalyzer.utils.UserSelection;
 import cryptoAnalyzer.utils.Result;
 import cryptoAnalyzer.utils.ChartData;
-import cryptoAnalyzer.gui.loginUi;
 
 
+/**
+ * CS 2212 
+ * The MainUI class repesents the main window of this program.
+ * Users can add to/remove from a list of cryptocurrencies to pull data from the CoinGeko API. 
+ * The user needs to select a starting date for the search interval, a metric to search, and a time interval for which to display the data
+ * The interval goes from the starting date selected to the current date that the system returns
+ * @author Matthew Cheverie
+ * @author Cole Duffy
+ * @author Namra Patel
+ * @author Jack DiFalco
+ *
+ */
 public class MainUI extends JFrame implements ActionListener{
-	/**
-	 * Summary of Changes:
-	 * - Created Analysis interface which all analysis Types implement, all analysis types still need their actual analysis
-	 * - Created factory class, still needs an implmenentation
-	 * - Created Result, ResultData, and User Selection
-	 * 
-	 * TO DO - 
-	 * I messed up on creation of ResultData class. I wrote is as handleing multiple cryptos when it should only handle since each 
-	 * result object is tied to one coin. 
-	 * Each Result object will have a ResultData object. We can then generate an object called ChartData which will
-	 * have Object[] columnNames (I think this is just similar to what is in his dummy data) and Object[][]data which will be the combination of all ResultData 's from all the Results.
-	 * The layout comes from his dummy data in DataVisualizationCreator
-	 * 
-	 * -Assign instance vars for metric, date, and interval.
-	 * 
-	 * Write all the performs for the different analysis
-	 *  - use dataFetcher for this
-	 * Write ChartData class
-	 * 
-	 *Implement All commented out code in this file
-	 *
-	 *How it works: 
-	 *Basically, we create a list of userSelcetion objects, one for each coin (metric, date and interval stay the same for each).
-	 * Then Run an analysis for each userSelection and store each Result in a list of Results. We then need to get 
-	 * the ResultData object from each result and combine the Data into a 2d array similar to 
-	 * the dummy data in his DataVisualizationCreator class. We will have to write a constructor for DataVisualizationCreator 
-	 * that takes in a CharData object as its parameter. Essentailly, the ChartData object will just replace his dummy data that
-	 * is hard coded in there
-	 *
-	 */
+	
+	/*Declare instance variables */
+	
 	private static final long serialVersionUID = 1L;
-
+	
+	//Declare instances of the differnt UI's we use
 	private static MainUI instance;
 	private static loginUi ins;
-	private JPanel stats, chartPanel, tablePanel;
 	
-	// Should be a reference to a separate object in actual implementation
-	private List<String> selectedList;
+	//Declare the JPanel object that will hold our graphs
+	private JPanel stats;
+	
+	// Declare the Java swing objects that users interface with
+	//These need to be instance variables so we can access them all throughout this UI class
 	private JComboBox<String> metricsList;
 	private JComboBox<String> intervalList;
 	private JDatePickerImpl datePicker;
 	private JTextArea selectedCryptoList;
 	private JComboBox<String> cryptoList;
-
+	
+	//Declare the list which we limit the users ability to search cryptos for
 	private RestrictedCryptoList restrictedCoins;
-
 	
-	private List<Result> listOfResults = new ArrayList<Result>(); // need a list of results because we need to keep track of each analysis for each coin
-	private List<UserSelection> listOfSelections = new ArrayList<UserSelection>(); // need a list because we need to store a new selection for each coin in the list
+	//Declare the lists needed to store all of the Data calculate analysis' and display them
+	private List<Result> listOfResults; // need a list of results because we need to keep track of each analysis for each coin
+	private List<UserSelection> listOfSelections;  // need a list because we need to store a new selection for each coin in the list
 	
-	private String selectedMetric = "price";
+	//Declare variables that represent the user selections
+	private List<String> selectedList;
+	private String selectedMetric = "price"; //Defaulted to price if the user does not change the selection
 	private Date selectedDate;
-	private String selectedInterval = "Daily";
+	private String selectedInterval = "Daily"; //Defaulted to Daily if the user does not change the selection
 	
+	//Declare the object that will store all result data that is needed to display charts
 	private ChartData theChartData;
+	
+	/**
+	 * This is the getter Class for the Instance variable called instance.
+	 * If instance is null, create a new one
+	 * @return MainUI instance - Returns the Instance variable called instance
+	 */
 	public static MainUI getInstance() {
 		if (instance == null)
 			instance = new MainUI();
@@ -108,6 +105,11 @@ public class MainUI extends JFrame implements ActionListener{
 		return instance;
 	}
 
+	@SuppressWarnings("serial")
+	/**
+	 * This is the constructor for the MainUI. It is made private to ensure that no other class can create a new 
+	 * instance of MainUI
+	 */
 	private MainUI() {
 		
 		// Set window title
@@ -116,8 +118,11 @@ public class MainUI extends JFrame implements ActionListener{
 		// Set top bar
 		JLabel chooseCountryLabel = new JLabel("Choose a cryptocurrency: ");
 		String[] cryptoNames = AvailableCryptoList.getInstance().getAvailableCryptos();
+		
+		//Create list of Restricted coins 
 		restrictedCoins = new RestrictedCryptoList(cryptoNames);
 		List <String> theCoins = restrictedCoins.getRestrictedCoins();
+		System.out.println("Restricted Coins:");
 		for(int i = 0; i <theCoins.size();i ++) {
 			System.out.println(theCoins.get(i));
 		}
@@ -167,7 +172,7 @@ public class MainUI extends JFrame implements ActionListener{
 		            Calendar cal = (Calendar) value;
 		            String dateReturn = dateFormatter.format(cal.getTime());
 		            if(verifyDate(currentDate,dateReturn)) {
-		            	selectedDate = dateFormatter.parse(dateReturn);
+		            	selectedDate = dateFormatter.parse(dateReturn); //Selected Date variable gets assigned here
 		            	return dateReturn;
 		            }
 		            else {
@@ -251,12 +256,21 @@ public class MainUI extends JFrame implements ActionListener{
 		getContentPane().add(west, BorderLayout.WEST);
 	}
 	
+	/**
+	 * This function will update the stats Jpanel
+	 * @param component - A java swing component of type JComponent
+	 */
 	public void updateStats(JComponent component) {
 		stats.add(component);
 		stats.revalidate();
 	}
 
-	
+	/**
+	 * This function will verify that the selected date is not a future date relative to the current date
+	 * @param currdate - The current date in the form of a String yyyy/mm/dd
+	 * @param selectedDate - The selected date in the form of a string dd/mm/yyyy
+	 * @return True if the date was verified to be valid, False if the date is a future date.
+	 */
 	public Boolean verifyDate(String currdate, String selectedDate) {
 		String[] currArray = currdate.split("-");
 		String[] selArray = selectedDate.split("/");
@@ -272,7 +286,10 @@ public class MainUI extends JFrame implements ActionListener{
 		//cur = y/m/day
 	}
 	
-
+	/**
+	 * The Main execution point for the MainUI
+	 * @param args - A String[] representing the command line arguments
+	 */
 	public static void main(String[] args) {
 		
 		ins = loginUi.getInstance();
@@ -291,40 +308,37 @@ public class MainUI extends JFrame implements ActionListener{
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		}
 	}
-
+	
+	
+	/**
+	 * The method implemented from ActionListener that will be overridden
+	 * This method will allow us to assign functionality to each of the Java.swing items such as buttons and selection lists
+	 * @param e - an event of type ActionEvent
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
+		
+		//If the refresh button is pressed
 		if ("refresh".equals(command)) {
 			
 			if(selectedList.isEmpty()) {
 				JOptionPane.showMessageDialog(null,"There are no cryptocurrencies selected. Please make at least one selection",
 						"Empty Coin List",JOptionPane.INFORMATION_MESSAGE);
 			}
+			if(selectedDate == null) {
+				JOptionPane.showMessageDialog(null,"There is no selected starting date. Please select a starting date!",
+						"No starting Date",JOptionPane.INFORMATION_MESSAGE);
+			}
 			else {
-				/*
-				 * Call method to create UserSelections and add them to selection list
-				 * this function will folow:
-				 * for all coins theCoin in selectedCryptos{
-				 * 		create new userSelection (theCoin, metric, date,interval);
-				 * 		add to userSelectionList;
-				 * }
-				 */
+				listOfResults = new ArrayList<Result>();
+				listOfSelections = new ArrayList<UserSelection>();
 				for(int i = 0; i <selectedList.size();i++) {
 					UserSelection newSelection = new UserSelection(selectedList.get(i),selectedInterval,selectedMetric,selectedDate);
 					listOfSelections.add(newSelection);
 				}
 				
-				/*Just a test to see if everything works, uncomment if you wish to use.
-				String datePatern = "dd-MM-yyyy";
-			    SimpleDateFormat dateFormatter = new SimpleDateFormat(datePatern);
-				for(int i = 0; i <listOfSelections.size();i++) {
-					System.out.println(listOfSelections.get(i).getCoin() +", "+
-									   listOfSelections.get(i).getInterval()+", "+
-									   listOfSelections.get(i).getAnalysisType()+", "+
-									   dateFormatter.format(listOfSelections.get(i).getDate()));
-				}
-				*/
+			
 				
 				
 				for(int i =0; i < listOfSelections.size(); i ++) {
@@ -334,28 +348,17 @@ public class MainUI extends JFrame implements ActionListener{
 					listOfResults.add(newResult);
 					
 				}
-				/*
-				for(int i = 0; i < listOfResults.size(); i++) {
-					Result theResult = listOfResults.get(i);
-					Object [] theData = theResult.getResultData();
-					for(int j = 0; j < theData.length; j++) {
-						System.out.println(theData[j].toString());
-					}
-				}
-				*/
+				
 				
 				theChartData = new ChartData(listOfResults, listOfSelections.get(0));
 				stats.removeAll(); // keep this line
-				
-				//Remove these 2 lines in place of result.notifyObservers();
 				DataVisualizationCreator creator = new DataVisualizationCreator(theChartData); 
 				creator.createCharts();
 			}
 			
 			
 			
-			
-			
+		//If the add coin button pressed	
 		} else if ("add".equals(command)) {
 			if(selectedList.contains(cryptoList.getSelectedItem())) {
 				JOptionPane.showMessageDialog(null,"The Coin you wish to add is already in the list!",
@@ -376,7 +379,7 @@ public class MainUI extends JFrame implements ActionListener{
 					
 				}
 			}
-			
+		//If the remove coin button is pressed
 		} else if ("remove".equals(command)) {
 			if(selectedList.contains(cryptoList.getSelectedItem())) {
 				selectedList.remove(cryptoList.getSelectedItem());
@@ -391,7 +394,7 @@ public class MainUI extends JFrame implements ActionListener{
             			"Invalid Remove",JOptionPane.INFORMATION_MESSAGE);
 			}
 			
-			
+		// If the user selects a metric	
 		}else if ("metric".equals(command)) {
 			//Get value of the metricsList object
 			String val = metricsList.getSelectedItem().toString();
@@ -422,7 +425,7 @@ public class MainUI extends JFrame implements ActionListener{
 					break;
 			}
 			
-			
+		//If the user Selects an interval	
 		}else if("interval".equals(command)) {
 			selectedInterval = intervalList.getSelectedItem().toString();
 		}
