@@ -15,7 +15,8 @@ import com.google.gson.JsonParser;
 
 
 /**
- * The AvailableCryptoList class implements 
+ * The AvailableCryptoList class implements functionality that determines which tokens are available
+ * to be read from the CoinGecko API and stores them with their name and ID.
  * 
  * @author	Matthew Cheverie
  * @author	Jack Di Falco

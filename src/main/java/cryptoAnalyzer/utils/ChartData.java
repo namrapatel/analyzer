@@ -17,21 +17,33 @@ public class ChartData {
 		dates = createdates(listOfResults.get(0).getResultData());
 		theData = createData(listOfResults);
 	}
+	
+	
 	public Object[] getDates() {
 		return this.dates;
 	}
+	
+	
 	public Object[][] getData(){
 		return this.theData;
 	}
+	
+	
 	public UserSelection getUserSelection() {
 		return this.theSelection;
 	}
+	
+	
 	public int getRow() {
 		return this.row;
 	}
+	
+	
 	public int getCol() {
 		return this.col;
 	}
+	
+	
 	private Object[] createdates(Object[] data) {
 		Object[] Dates = new Object[data.length-1];
 		Date currentDate = new Date();
@@ -85,6 +97,7 @@ public class ChartData {
 		}
 		return Dates;
 	}
+	
 	private Object[][] createData(List<Result> theResults){
 		row = theResults.size();
 		col = theResults.get(0).getResultData().length;
@@ -97,10 +110,10 @@ public class ChartData {
 		return data;
 		
 	}
+	
 	private String dateFormatter(Date theDate) {
 		String datePatern = "dd-MM-yyyy";
 	    SimpleDateFormat dateFormatter = new SimpleDateFormat(datePatern);
 	    return dateFormatter.format(theDate);
 	}
-	
 }

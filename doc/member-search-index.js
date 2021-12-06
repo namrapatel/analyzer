@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"cryptoAnalyzer.utils","c":"AvailableCryptoList","l":"getAvailableCryptos()"},{"p":"cryptoAnalyzer.utils","c":"AvailableCryptoList","l":"getCryptoID(String)","url":"getCryptoID(java.lang.String)"},{"p":"cryptoAnalyzer.utils","c":"AvailableCryptoList","l":"getInstance()"}]
